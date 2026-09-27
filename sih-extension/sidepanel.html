@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>YUKTI</title>
+<style>
+  /* ============================================================
+     PROJECT YUKTI — "VOIDGLASS" THEME
+     Dark purple/black 3D glass UI + electric-blue interaction language.
+     Design rule: purple/magenta = ambient chrome, electric blue = "this
+     is touchable" (cursor, focus states, active CTA glow). Keeps the
+     palette disciplined instead of scattering colour everywhere.
+     ============================================================ */
+
+  :root {
+    --bg-void:      #05030b;
+    --bg-deep:      #0a0616;
+    --bg-panel:     #120b24;
+    --bg-panel-2:   #170f2e;
+    --edge-glow:    #4c2f8f;
+    --edge-soft:    #241a3d;
+
+    --violet-1:     #a855f7;
+    --violet-2:     #7c3aed;
+    --violet-3:     #5b21b6;
+    --magenta:      #e879f9;
+
+    --electric:     #38bdf8;   /* the "you can touch this" colour */
+    --electric-2:   #60a5fa;
+    --electric-soft: rgba(56,189,248,0.35);
+
+    --text-hi:      #f4eeff;
+    --text-mid:     #b7ace0;
+    --text-low:     #6a5f8c;
+
+    --success:      #34d399;
+    --error:        #fb7185;
+
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 9px;
+
+    --shadow-deep: 0 24px 70px -18px rgba(0,0,0,0.95);
+    --shadow-lift: 0 14px 34px -10px rgba(124,58,237,0.45);
+  }
+
+  * { box-sizing: border-box; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--violet-2), var(--magenta));
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--electric); }
+
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100vh;
+    background: var(--bg-void);
+    color: var(--text-hi);
+    font-family: 'Segoe UI', -apple-system, 'Inter', Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--electric);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  body {
+    display: flex; flex-direction: column;
+    position: relative;
+    background:
+      radial-gradient(circle at 12% -8%, rgba(124,58,237,0.38), transparent 45%),
+      radial-gradient(circle at 112% 18%, rgba(232,121,249,0.16), transparent 42%),
+      radial-gradient(circle at 50% 118%, rgba(56,189,248,0.10), transparent 50%),
+      var(--bg-void);
+  }
+
+  /* film-grain texture for a premium, non-flat surface */
+  body::after {
+    content: "";
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    opacity: 0.035; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  #bg-grid {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(168,85,247,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168,85,247,0.055) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse 90% 65% at 50% 8%, #000 40%, transparent 92%);
+  }
+
+  .orb {
+    position: absolute; z-index: 0; border-radius: 50%;
+    filter: blur(58px); opacity: 0.32; pointer-events: none;
+    animation: float 10s ease-in-out infinite;
+  }
+  .orb-1 { width: 220px; height: 220px; top: -80px; left: -60px; background: var(--violet-2); }
+  .orb-2 { width: 180px; height: 180px; bottom: 10%; right: -60px; background: var(--magenta); animation-delay: -4s; }
+  .orb-3 { width: 140px; height: 140px; bottom: -40px; left: 20%; background: var(--electric); opacity: 0.14; animation-delay: -2s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orb, #logo-wrap .ring, #title-block h1, .status-pill .pulse { animation: none !important; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-18px) translateX(10px); }
+  }
+
+  /* ============================================================
+     HEADER
+     ============================================================ */
+  #header {
+    position: relative; z-index: 2;
+    padding: 22px 18px 18px; display: flex; align-items: center; gap: 14px;
+    border-bottom: 1px solid var(--edge-soft);
+    background: linear-gradient(180deg, rgba(124,58,237,0.12), transparent 90%);
+  }
+
+  #logo-wrap {
+    position: relative; width: 50px; height: 50px; flex-shrink: 0;
+    filter: drop-shadow(0 6px 18px rgba(124,58,237,0.6));
+  }
+  #logo-wrap .ring {
+    position: absolute; inset: -8px; border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--violet-1), var(--electric), var(--magenta), var(--violet-1));
+    animation: spin 5s linear infinite;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #logo-mark {
+    position: relative; z-index: 1; width: 50px; height: 50px;
+    background: radial-gradient(circle at 35% 25%, #1c1230, var(--bg-void) 70%);
+    border-radius: 50%;
+  }
+
+  #title-block h1 {
+    margin: 0; font-size: 22px; font-weight: 900; letter-spacing: 1.5px;
+    background: linear-gradient(120deg, var(--violet-1) 0%, var(--magenta) 50%, var(--electric) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: shine 6s linear infinite;
+    text-shadow: 0 0 30px rgba(168,85,247,0.25);
+  }
+  @keyframes shine { to { background-position: 200% center; } }
+  #title-block p { margin: 3px 0 0; font-size: 10.5px; color: var(--text-low); letter-spacing: 0.5px; }
+
+  /* ============================================================
+     STATUS ROW
+     ============================================================ */
+  #status-row {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+    border-bottom: 1px solid var(--edge-soft); flex-wrap: wrap;
+  }
+  .status-pill {
+    display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600;
+    color: var(--text-mid);
+    background: linear-gradient(145deg, var(--bg-panel-2), var(--bg-panel));
+    padding: 6px 12px; border-radius: 20px;
+    border: 1px solid var(--edge-glow);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 12px -4px rgba(0,0,0,0.6);
+  }
+  .status-pill .pulse {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 0 rgba(52,211,153,0.7), 0 0 8px var(--success);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.55), 0 0 8px var(--success); }
+    70% { box-shadow: 0 0 0 8px rgba(52,211,153,0), 0 0 8px var(--success); }
+    100% { box-shadow: 0 0 0 0 rgba(52,211,153,0), 0 0 8px var(--success); }
+  }
+
+  /* ============================================================
+     CONTENT / PANELS — glass, 3D tilt, pointer-tracked glare
+     ============================================================ */
+  #content {
+    position: relative; z-index: 2; flex: 1; overflow-y: auto;
+    padding: 16px; display: flex; flex-direction: column; gap: 16px;
+    perspective: 900px;
+  }
+
+  .panel {
+    --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
+    background: linear-gradient(160deg, rgba(23,15,46,0.88) 0%, rgba(18,11,36,0.92) 100%);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid var(--edge-glow);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow:
+      var(--shadow-deep),
+      inset 0 1px 0 rgba(255,255,255,0.05),
+      inset 0 -14px 26px -22px rgba(168,85,247,0.28);
+    position: relative;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transform-style: preserve-3d;
+    transition: box-shadow 0.25s ease, transform 0.12s ease-out;
+    will-change: transform;
+  }
+  .panel::before {
+    content: ""; position: absolute; inset: 0; border-radius: var(--radius-lg);
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(168,85,247,0.55), rgba(232,121,249,0.08) 40%, transparent 70%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events: none;
+  }
+  .panel::after {
+    content: ""; position: absolute; inset: 0; border-radius: var(--radius-lg);
+    background: radial-gradient(circle at var(--mx) var(--my), rgba(96,200,255,0.14), transparent 55%);
+    opacity: 0; transition: opacity 0.25s ease; pointer-events: none;
+  }
+  .panel:hover { box-shadow: var(--shadow-lift), inset 0 1px 0 rgba(255,255,255,0.06); }
+  .panel:hover::after { opacity: 1; }
+
+  .panel-title {
+    font-weight: 800; margin-bottom: 12px; font-size: 11.5px;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--violet-1);
+    text-shadow: 0 0 18px rgba(168,85,247,0.35);
+  }
+
+  /* ============================================================
+     PRIVATE PROFILE
+     ============================================================ */
+  #profileEmptyState { font-size: 12px; color: var(--text-mid); line-height: 1.5; }
+  #profileFileInput { display: none; }
+
+  .btn-small {
+    padding: 9px 14px; border-radius: 10px; cursor: pointer;
+    background: linear-gradient(160deg, #1c1433, #120b24);
+    border: 1px solid var(--edge-glow);
+    color: var(--text-hi);
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.2px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 10px -4px rgba(0,0,0,0.7);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.2s ease;
+  }
+  .btn-small:hover {
+    transform: translateY(-2px);
+    border-color: var(--electric);
+    box-shadow: 0 8px 20px -6px var(--electric-soft), inset 0 1px 0 rgba(255,255,255,0.08);
+    background: linear-gradient(160deg, #241a44, #150e2b);
+  }
+  .btn-small:active { transform: translateY(0); }
+  .btn-small.accent {
+    border-color: var(--violet-2);
+    color: #fff;
+    background: linear-gradient(150deg, var(--violet-3), #3b1f78);
+  }
+  .btn-small.accent:hover {
+    box-shadow: 0 8px 22px -6px rgba(124,58,237,0.7);
+  }
+
+  .btn-row { display: flex; gap: 9px; margin-top: 10px; flex-wrap: wrap; }
+  #profileLoaded { display: none; }
+  #profileFileName { font-size: 13px; color: var(--text-hi); font-weight: 700; }
+  .profile-status-line {
+    font-size: 11px; color: var(--success); margin-top: 6px; font-weight: 600;
+  }
+  #profileFieldsView {
+    display: none; margin-top: 12px; font-size: 11.5px;
+    background: var(--bg-void); border-radius: 10px; padding: 10px;
+    max-height: 200px; overflow-y: auto;
+    border: 1px solid var(--edge-soft);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
+  }
+  #profileFieldsView div { padding: 3px 0; color: var(--text-low); }
+  #profileFieldsView span { color: var(--text-hi); font-weight: 600; }
+  .hint-text { font-size: 10.5px; color: var(--text-low); margin-top: 8px; line-height: 1.5; }
+
+  /* ============================================================
+     AGENT PANEL
+     ============================================================ */
+  #commandBox {
+    width: 100%; padding: 14px; border-radius: 12px;
+    border: 1px solid var(--edge-glow);
+    background: var(--bg-void);
+    color: var(--text-hi); font-size: 13px; resize: none; min-height: 66px;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.6);
+    font-family: inherit;
+  }
+  #commandBox::placeholder { color: var(--text-low); }
+  #commandBox:focus {
+    border-color: var(--electric);
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.6), 0 0 0 3px var(--electric-soft);
+  }
+
+  #submitBtn {
+    padding: 14px; border-radius: 12px; border: none; cursor: pointer;
+    background: linear-gradient(100deg, var(--violet-3), var(--violet-2) 45%, var(--magenta));
+    background-size: 180% auto;
+    color: #fff; font-weight: 800; font-size: 13.5px; letter-spacing: 0.5px;
+    box-shadow: 0 10px 26px -8px rgba(124,58,237,0.65), inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-position 0.4s ease;
+    text-transform: uppercase;
+  }
+  #submitBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background-position: 100% center;
+    box-shadow: 0 0 0 1px var(--electric-soft), 0 14px 36px -8px var(--electric-soft), 0 4px 20px -4px rgba(217,70,239,0.5);
+  }
+  #submitBtn:active:not(:disabled) { transform: translateY(0px) scale(0.99); }
+  #submitBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ============================================================
+     PREVIEW / LOG / METRICS
+     ============================================================ */
+  #previewImg {
+    width: 100%; border-radius: 12px; cursor: zoom-in; display: none;
+    border: 1px solid var(--edge-glow);
+    box-shadow: 0 12px 30px -10px rgba(0,0,0,0.8);
+    transition: transform 0.2s ease;
+  }
+  #previewImg:hover { transform: scale(1.01); }
+
+  #logConsole {
+    background: #030106; border-radius: 12px; padding: 12px;
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 11px; height: 200px; overflow-y: auto;
+    color: var(--electric-2); white-space: pre-wrap; line-height: 1.6;
+    border: 1px solid var(--edge-soft);
+    box-shadow: inset 0 2px 14px rgba(0,0,0,0.8);
+  }
+  .log-line { margin-bottom: 4px; }
+  .log-info { color: #7dd3fc; }
+  .log-success { color: var(--success); }
+  .log-error { color: var(--error); }
+  .log-nav { color: var(--magenta); }
+  .log-placeholder { color: var(--text-low); font-style: italic; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  td { padding: 6px 0; color: var(--text-low); border-bottom: 1px solid var(--edge-soft); }
+  tr:last-child td { border-bottom: none; }
+  td:last-child { text-align: right; font-weight: 800; color: var(--violet-1); }
+
+  /* ============================================================
+     PRIVACY SHIELD
+     ============================================================ */
+  .privacy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 11.5px; }
+  .privacy-col-title {
+    color: var(--text-low); font-weight: 800; margin-bottom: 6px;
+    text-transform: uppercase; font-size: 10px; letter-spacing: 0.6px;
+  }
+  .privacy-item { padding: 3px 0; color: var(--text-mid); }
+  .privacy-yes { color: var(--success); font-weight: 600; }
+  .privacy-no { color: var(--error); }
+
+  #serverViewJson {
+    background: var(--bg-void); border-radius: 10px; padding: 10px;
+    font-family: 'Consolas', monospace; font-size: 10.5px; color: #93c5fd;
+    max-height: 170px; overflow-y: auto; white-space: pre-wrap;
+    border: 1px solid var(--edge-soft);
+  }
+  .toggle-link {
+    font-size: 10.5px; color: var(--electric); cursor: pointer;
+    text-decoration: none; border-bottom: 1px dashed var(--electric);
+  }
+  .toggle-link:hover { color: var(--magenta); border-color: var(--magenta); }
+
+  /* ============================================================
+     ELECTRIC CURSOR — blue glow + lightning trail
+     ============================================================ */
+  body.electric-cursor,
+  body.electric-cursor * {
+    cursor: none !important;
+  }
+  #cursorFx {
+    position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+  }
+  #cursorRing {
+    position: fixed; top: 0; left: 0; width: 34px; height: 34px;
+    margin: -17px 0 0 -17px; border-radius: 50%;
+    border: 1.5px solid rgba(56,189,248,0.55);
+    box-shadow: 0 0 18px rgba(56,189,248,0.35) inset, 0 0 24px rgba(96,165,250,0.25);
+    pointer-events: none; z-index: 9999;
+    transition: transform 0.12s cubic-bezier(.2,.8,.2,1), opacity 0.2s ease, width 0.15s ease, height 0.15s ease, margin 0.15s ease;
+    will-change: transform;
+  }
+  #cursorRing.press {
+    width: 24px; height: 24px; margin: -12px 0 0 -12px;
+    border-color: rgba(232,121,249,0.7);
+  }
+  #cursorDot {
+    position: fixed; top: 0; left: 0; width: 9px; height: 9px;
+    margin: -4.5px 0 0 -4.5px; border-radius: 50%;
+    background: radial-gradient(circle, #eafcff 0%, #38bdf8 55%, transparent 75%);
+    box-shadow:
+      0 0 8px 2px rgba(56,189,248,0.9),
+      0 0 22px 6px rgba(56,189,248,0.55),
+      0 0 46px 14px rgba(59,130,246,0.35);
+    pointer-events: none; z-index: 10000;
+    transition: opacity 0.2s ease;
+    will-change: transform;
+  }
+</style>
+</head>
+<body>
+
+  <div id="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <svg id="shield-bg" viewBox="0 0 100 116" fill="none" style="display:none;">
+    <path d="M50 2 L95 18 V56 C95 88 74 106 50 114 C26 106 5 88 5 56 V18 Z" stroke="#a855f7" stroke-width="2"/>
+  </svg>
+
+  <div id="header">
+    <div id="logo-wrap">
+      <div class="ring"></div>
+      <svg id="logo-mark" viewBox="0 0 100 116" fill="none">
+        <path d="M50 2 L95 18 V56 C95 88 74 106 50 114 C26 106 5 88 5 56 V18 Z"
+          stroke="url(#lg)" stroke-width="6" fill="none"/>
+        <path d="M32 58 L45 71 L70 42" stroke="url(#lg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="100" y2="116">
+            <stop offset="0%" stop-color="#a855f7"/>
+            <stop offset="55%" stop-color="#e879f9"/>
+            <stop offset="100%" stop-color="#38bdf8"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div id="title-block">
+      <h1>YUKTI</h1>
+      <p>Privacy-Preserving Autonomous Vision Agent</p>
+    </div>
+  </div>
+
+  <div id="status-row">
+    <div class="status-pill"><span class="pulse"></span> Protection Active</div>
+    <div class="status-pill">Local Vision Ready</div>
+  </div>
+
+  <div id="content">
+
+    <!-- ============ PRIVATE PROFILE PANEL ============ -->
+    <div class="panel">
+      <div class="panel-title">🔒 Private Profile</div>
+
+      <div id="profileEmptyState">
+        No resume uploaded yet. Your resume is parsed locally and never leaves this device.
+        <div class="btn-row">
+          <button class="btn-small" id="uploadResumeBtn">Upload Resume PDF</button>
+          <button class="btn-small accent" id="addFieldEmptyBtn">Add Field Manually</button>
+        </div>
+      </div>
+
+      <div id="profileLoaded">
+        <div id="profileFileName"></div>
+        <div class="profile-status-line">✓ Processed locally &nbsp; ✓ Private data stays on this device</div>
+        <div class="btn-row">
+          <button class="btn-small" id="viewProfileBtn">View Profile</button>
+          <button class="btn-small accent" id="addFieldBtn">Add/Edit Field</button>
+          <button class="btn-small" id="replaceResumeBtn">Replace Resume</button>
+          <button class="btn-small" id="deleteProfileBtn">Delete Profile</button>
+        </div>
+        <div class="hint-text">If a field wasn't extracted correctly (e.g. Name, Project), use "Add/Edit Field" to fix or add it.</div>
+        <div id="profileFieldsView"></div>
+      </div>
+
+      <input type="file" id="profileFileInput" accept="application/pdf" />
+    </div>
+
+    <!-- ============ AGENT PANEL ============ -->
+    <div class="panel">
+      <div class="panel-title">🤖 Agent</div>
+      <textarea id="commandBox" placeholder="e.g. Fill this Google Form using my resume"></textarea>
+      <div class="btn-row" style="margin-top:10px;">
+        <button id="submitBtn" style="flex:1;">Run Task</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Captured &amp; Redacted View</div>
+      <img id="previewImg" />
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Agent Activity</div>
+      <div id="logConsole"><div class="log-line log-placeholder">Waiting for task...</div></div>
+    </div>
+
+    <!-- ============ LIVE PRIVACY SHIELD ============ -->
+    <div class="panel" id="privacyShieldPanel" style="display:none;">
+      <div class="panel-title">🛡️ Privacy Shield</div>
+      <div class="privacy-grid">
+        <div>
+          <div class="privacy-col-title">Stays Local</div>
+          <div id="privacyLocalList"></div>
+        </div>
+        <div>
+          <div class="privacy-col-title">Sent to Server</div>
+          <div id="privacyServerList"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px; font-size:11.5px; color: var(--text-mid);">
+        <div>PII Detected: <span id="piiDetectedCount" style="color:var(--text-hi); font-weight:700;">0</span></div>
+        <div>PII Redacted: <span id="piiRedactedCount" style="color:var(--success); font-weight:700;">0</span></div>
+        <div>PII Transmitted: <span id="piiTransmittedCount" style="color:var(--text-hi); font-weight:700;">0</span></div>
+      </div>
+      <div style="margin-top:8px;"><span class="toggle-link" id="toggleServerView">Show exact payload sent to server ▾</span></div>
+      <pre id="serverViewJson" style="display:none;"></pre>
+    </div>
+
+    <div class="panel" id="metricsPanel" style="display:none;">
+      <div class="panel-title">Performance</div>
+      <table id="metricsTable"></table>
+    </div>
+  </div>
+
+  <!-- PDF.js is loaded LOCALLY from the lib/ folder (not from a CDN) -->
+  <script src="lib/pdf.min.js"></script>
+  <script src="lib/face-api.min.js"></script>
+  <script src="resumeParser.js"></script>
+  <script src="profileStore.js"></script>
+  <script src="sidepanel.js"></script>
+
+  <!-- UI POLISH LAYER — 3D panel tilt + electric-blue lightning cursor.
+       Must be an external file: MV3's default CSP blocks inline <script>
+       tags in extension pages, so this logic can't live inline anymore. -->
+  <script src="cursorFx.js"></script>
+</body>
+</html>

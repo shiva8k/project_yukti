@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Project YUKTI",
+  "version": "1.1",
+  "description": "Privacy-preserving autonomous vision agent for browser",
+  "permissions": ["activeTab", "scripting", "tabs", "sidePanel", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "action": {},
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/pdf.worker.min.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
